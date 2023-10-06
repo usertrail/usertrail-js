@@ -1,20 +1,30 @@
 export interface UserTrailOptions {
-  apiKey: string;
+  key: string;
   enabled?: boolean;
+  userId?: string;
 }
 
 export interface UserTrailEvent {
   eventName: string;
+  userId?: string;
+}
+
+export interface IdentifyOptions {
   userId: string;
 }
 
 export default class UserTrail {
-  apiKey: string;
+  key: string;
   enabled: boolean;
+  userId?: string;
 
   constructor(options: UserTrailOptions) {
-    this.apiKey = options.apiKey;
+    this.key = options.key;
     this.enabled = options.enabled ?? true;
+  }
+
+  public identify(options: IdentifyOptions) {
+    this.userId = options.userId
   }
 
   public async track(event: UserTrailEvent) {
@@ -22,19 +32,35 @@ export default class UserTrail {
       return;
     }
 
+    const userId = event.userId || this.userId
+
+    // validate
+    if (!userId) {
+      throw new Error("Failed to send event to UserTrail API: Missing userId")
+    }
+
+    if (!this.key) {
+      throw new Error("Failed to send event to UserTrail API: Missing key")
+    }
+
+    if (!event.eventName) {
+      throw new Error("Failed to send event to UserTrail API: Missing eventName")
+    }
+
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.apiKey}`
+      Authorization: `Bearer ${this.key}`
     }
 
     const body = JSON.stringify({
       event_name: event.eventName,
-      user_id: event.userId,
+      user_id: userId,
     });
 
     // Send event to UserTrail API
     const response = await fetch("https://api.usertrail.io/v1/events", {
-      method: "POST", body, headers });
+      method: "POST", body, headers
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to send event to UserTrail API: ${response.status} ${response.statusText}`);
