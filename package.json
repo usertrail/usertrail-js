@@ -1,6 +1,6 @@
 {
   "name": "usertrail-js",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "UserTrail JS SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
