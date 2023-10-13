@@ -9,6 +9,11 @@ export interface UserTrailEvent {
   userId?: string;
 }
 
+export interface UpdateIdentityOptions {
+  userId?: string;
+  newUserId: string;
+}
+
 export interface IdentifyOptions {
   userId: string;
 }
@@ -26,6 +31,7 @@ export default class UserTrail {
   public identify(options: IdentifyOptions) {
     this.userId = options.userId
   }
+
 
   public async track(event: UserTrailEvent) {
     if (!this.enabled) {
@@ -64,6 +70,46 @@ export default class UserTrail {
 
     if (!response.ok) {
       throw new Error(`Failed to send event to UserTrail API: ${response.status} ${response.statusText}`);
+    }
+  }
+
+  public async updateIdentity(updateIdentityOptions: UpdateIdentityOptions) {
+    if (!this.enabled) {
+      return;
+    }
+
+    const userId = updateIdentityOptions.userId || this.userId
+
+    // validate
+    if (!userId) {
+      throw new Error("Failed to update identity: Missing userId")
+    }
+
+    if (!this.key) {
+      throw new Error("Failed to send event to UserTrail API: Missing key")
+    }
+
+    if (!updateIdentityOptions.newUserId) {
+      throw new Error("Failed to update identity: Missing newUserId");
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.key}`
+    }
+
+    const body = JSON.stringify({
+      new_user_id: updateIdentityOptions.newUserId,
+      user_id: userId,
+    });
+
+    // Send event to UserTrail API
+    const response = await fetch("https://api.usertrail.io/v1/identity", {
+      method: "PATCH", body, headers
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update identity: ${response.status} ${response.statusText}`);
     }
   }
 }
