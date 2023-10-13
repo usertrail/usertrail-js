@@ -62,3 +62,14 @@ usertrail.track({
   userId: "user-123-456" // will override the client user id if exists
 });
 ```
+
+### Updating user id
+You can assign a new user id to an existing user. This will update the user data and events from the old user id to the new user id.
+Useful when a user signs up, and you want to keep the events from the anonymous user.
+
+```javascript
+await usertrail.updateIdentity({
+  userId: "user-id-1",
+  newUserId: "user-id-2"
+});
+```

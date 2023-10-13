@@ -16,8 +16,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/usertrail/usertrail-js.git"
   },
+  "homepage": "https://github.com/usertrail/usertrail-js",
   "author": "Yossi Segev",
   "license": "MIT",
   "devDependencies": {
